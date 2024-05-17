@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:toonflix/widgets/button.dart';
-import 'package:toonflix/widgets/currency_card.dart';
 import 'package:intl/intl.dart';
+import 'models/stock.dart';
+import 'screens/convert_screen.dart';
+import 'widgets/button.dart';
+import 'widgets/currency_card.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,21 +28,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  double totalBalance = 0;
-  int selectedIndex = -1; // 선택된 카드 인덱스를 저장하는 변수
+  double totalBalance = 274936;
+  int selectedIndex = -1;
+
+  List<Stock> stocks = [
+    Stock(name: '삼성전자', count: 1842.05, value: 102234),
+    Stock(name: '애플', count: 380.45, value: 72234),
+    Stock(name: 'USD', count: 60234, value: 60234),
+    Stock(name: 'KRW', count: 56327600, value: 40234),
+  ];
 
   @override
   void initState() {
     super.initState();
-    _calculateTotalBalance();
-  }
-
-  void _calculateTotalBalance() {
-    List<double> values = [102234, 72234, 60234, 40234]; // Wallet values
-
-    setState(() {
-      totalBalance = values.reduce((value, element) => value + element);
-    });
   }
 
   String _formatCurrency(double value) {
@@ -54,6 +54,27 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void _navigateToConvertScreen(BuildContext context, Stock fromStock) async {
+    final result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            ConvertScreen(fromStock: fromStock, stocks: stocks),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        fromStock.count -= result['fromStockCount']!;
+        fromStock.value -= result['fromStockValue']!;
+        Stock toStock =
+            stocks.firstWhere((stock) => stock.name == result['toStockName']);
+        toStock.count += result['toStockCount']!;
+        toStock.value += result['toStockValue']!;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,9 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -94,9 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 120,
-              ),
+              const SizedBox(height: 120),
               Text(
                 'Total balance',
                 style: TextStyle(
@@ -117,77 +134,63 @@ class _MyHomePageState extends State<MyHomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Button(
-                        text: 'Transfer',
-                        bgColor: Color(0xFFF1B33B),
-                        textColor: Colors.black),
+                      text: 'Deposit',
+                      bgColor: Color(0xFFF1B33B),
+                      textColor: Colors.black,
+                      width: 180, // 고정된 너비 설정
+                    ),
                     Button(
-                        text: 'Request',
-                        bgColor: Color.fromARGB(255, 70, 75, 80),
-                        textColor: Colors.white)
+                      text: 'Withdraw',
+                      bgColor: Color.fromARGB(255, 70, 75, 80),
+                      textColor: Colors.white,
+                      width: 180, // 고정된 너비 설정
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 60,
-              ),
+              const SizedBox(height: 60),
               const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Wallets',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    Text('View All',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                        )),
-                  ]),
-              const SizedBox(
-                height: 20,
-              ),
-              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CurrencyCard(
-                    name: '삼성전자',
-                    amount: '6.342',
-                    value: '102,234',
-                    icon: Icons.euro_rounded,
-                    isInverted: false,
-                    isSelected: selectedIndex == 0,
-                    onTap: () => _handleCardTap(0),
+                  Text(
+                    'Wallets',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  CurrencyCard(
-                    name: '애플',
-                    amount: '3.235',
-                    value: '72,234',
-                    icon: Icons.euro_rounded,
-                    isInverted: true,
-                    isSelected: selectedIndex == 1,
-                    onTap: () => _handleCardTap(1),
-                  ),
-                  CurrencyCard(
-                    name: 'USD',
-                    amount: '6.342',
-                    value: '60,234',
-                    icon: Icons.euro_rounded,
-                    isInverted: false,
-                    isSelected: selectedIndex == 2,
-                    onTap: () => _handleCardTap(2),
-                  ),
-                  CurrencyCard(
-                    name: 'KRW',
-                    amount: '14.24',
-                    value: '40,234',
-                    icon: Icons.euro_rounded,
-                    isInverted: true,
-                    isSelected: selectedIndex == 3,
-                    onTap: () => _handleCardTap(3),
+                  Text(
+                    'View All',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 20),
+              Column(
+                children: stocks.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  Stock stock = entry.value;
+                  return Column(
+                    children: [
+                      CurrencyCard(
+                        name: stock.name,
+                        amount: stock.count.toStringAsFixed(2),
+                        value: _formatCurrency(stock.value),
+                        icon: Icons.euro_rounded,
+                        isInverted: false,
+                        isSelected: selectedIndex == index,
+                        onTap: () => _handleCardTap(index),
+                        showPopup: () =>
+                            _navigateToConvertScreen(context, stock),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  );
+                }).toList(),
               ),
             ],
           ),
