@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:toonflix/widgets/button.dart';
 import 'package:toonflix/widgets/currency_card.dart';
-import 'package:intl/intl.dart'; // 이 줄을 추가합니다.
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,6 +27,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   double totalBalance = 0;
+  int selectedIndex = -1; // 선택된 카드 인덱스를 저장하는 변수
 
   @override
   void initState() {
@@ -43,9 +44,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String _formatCurrency(double value) {
-    final formatter =
-        NumberFormat('#,##0'); // NumberFormat 객체를 생성하여 세 자리마다 콤마를 찍도록 설정합니다.
+    final formatter = NumberFormat('#,##0');
     return formatter.format(value);
+  }
+
+  void _handleCardTap(int index) {
+    setState(() {
+      selectedIndex = (selectedIndex == index) ? -1 : index;
+    });
   }
 
   @override
@@ -143,42 +149,45 @@ class _MyHomePageState extends State<MyHomePage> {
               const SizedBox(
                 height: 20,
               ),
-              const CurrencyCard(
-                name: '삼성전자',
-                amount: '6.342',
-                value: '102,234',
-                icon: Icons.euro_rounded,
-                isInverted: false,
-              ),
-              Transform.translate(
-                offset: const Offset(0, -15),
-                child: const CurrencyCard(
-                  name: '애플',
-                  amount: '3.235',
-                  value: '72,234',
-                  icon: Icons.euro_rounded,
-                  isInverted: true,
-                ),
-              ),
-              Transform.translate(
-                offset: const Offset(0, -25),
-                child: const CurrencyCard(
-                  name: 'USD',
-                  amount: '6.342',
-                  value: '60,234',
-                  icon: Icons.euro_rounded,
-                  isInverted: false,
-                ),
-              ),
-              Transform.translate(
-                offset: const Offset(0, -35),
-                child: const CurrencyCard(
-                  name: 'KRW',
-                  amount: '14.24',
-                  value: '40,234',
-                  icon: Icons.euro_rounded,
-                  isInverted: true,
-                ),
+              Column(
+                children: [
+                  CurrencyCard(
+                    name: '삼성전자',
+                    amount: '6.342',
+                    value: '102,234',
+                    icon: Icons.euro_rounded,
+                    isInverted: false,
+                    isSelected: selectedIndex == 0,
+                    onTap: () => _handleCardTap(0),
+                  ),
+                  CurrencyCard(
+                    name: '애플',
+                    amount: '3.235',
+                    value: '72,234',
+                    icon: Icons.euro_rounded,
+                    isInverted: true,
+                    isSelected: selectedIndex == 1,
+                    onTap: () => _handleCardTap(1),
+                  ),
+                  CurrencyCard(
+                    name: 'USD',
+                    amount: '6.342',
+                    value: '60,234',
+                    icon: Icons.euro_rounded,
+                    isInverted: false,
+                    isSelected: selectedIndex == 2,
+                    onTap: () => _handleCardTap(2),
+                  ),
+                  CurrencyCard(
+                    name: 'KRW',
+                    amount: '14.24',
+                    value: '40,234',
+                    icon: Icons.euro_rounded,
+                    isInverted: true,
+                    isSelected: selectedIndex == 3,
+                    onTap: () => _handleCardTap(3),
+                  ),
+                ],
               ),
             ],
           ),
