@@ -24,6 +24,7 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _MyHomePageState createState() => _MyHomePageState();
 }
 
@@ -75,8 +76,18 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void _handleConvertButtonPressed() {
+    // 선택된 주식이 없는 경우 첫 번째 주식을 기본으로 사용
+    final Stock fromStock =
+        selectedIndex != -1 ? stocks[selectedIndex] : stocks[0];
+    _navigateToConvertScreen(context, fromStock);
+  }
+
   @override
   Widget build(BuildContext context) {
+    // 화면 너비를 가져옵니다.
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: const Color(0xFF181818),
       body: SingleChildScrollView(
@@ -128,22 +139,31 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: Colors.white.withOpacity(1),
                     fontWeight: FontWeight.bold),
               ),
-              const Padding(
-                padding: EdgeInsets.only(top: 20.0),
+              Padding(
+                padding: const EdgeInsets.only(top: 20.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Button(
                       text: 'Deposit',
-                      bgColor: Color(0xFFF1B33B),
-                      textColor: Colors.black,
-                      width: 180, // 고정된 너비 설정
+                      bgColor: const Color.fromARGB(255, 70, 75, 80),
+                      textColor: Colors.white,
+                      width: screenWidth * 0.25, // 화면 너비의 25%로 설정
+                      onTap: () {}, // 여기에 버튼 동작 추가
                     ),
                     Button(
                       text: 'Withdraw',
-                      bgColor: Color.fromARGB(255, 70, 75, 80),
+                      bgColor: const Color.fromARGB(255, 70, 75, 80),
                       textColor: Colors.white,
-                      width: 180, // 고정된 너비 설정
+                      width: screenWidth * 0.25, // 화면 너비의 25%로 설정
+                      onTap: () {}, // 여기에 버튼 동작 추가
+                    ),
+                    Button(
+                      text: 'Convert',
+                      bgColor: const Color.fromARGB(255, 9, 116, 166),
+                      textColor: Colors.white,
+                      width: screenWidth * 0.25, // 화면 너비의 25%로 설정
+                      onTap: _handleConvertButtonPressed,
                     ),
                   ],
                 ),

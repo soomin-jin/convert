@@ -26,10 +26,7 @@ class CurrencyCard extends StatelessWidget {
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 20),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          height: isSelected ? 180 : 100,
+        child: Container(
           decoration: BoxDecoration(
             color: isInverted
                 ? const Color.fromARGB(255, 241, 238, 238)
@@ -88,33 +85,6 @@ class CurrencyCard extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
-                const Spacer(), // 남은 공간을 차지하여 아래 여백 확보
-                const SizedBox(height: 10), // Convert 버튼 상단에 여백 추가
-                AnimatedOpacity(
-                  opacity: isSelected ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 300),
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: Container(
-                      width: 100, // 버튼 너비 조정
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF1B33B), // Transfer 버튼 배경 색상
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: TextButton(
-                        onPressed: showPopup,
-                        child: const Text(
-                          'Convert',
-                          style: TextStyle(
-                            color: Colors.black, // Transfer 버튼의 텍스트 색상과 동일하게 설정
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
                 ),
               ],
             ),
