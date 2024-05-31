@@ -28,23 +28,28 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  double totalBalance = 274936;
+  double totalBalance = 0;
   int selectedIndex = -1;
 
   List<Stock> stocks = [
-    Stock(name: '삼성전자', count: 1842.05, value: 102234),
-    Stock(name: '애플', count: 380.45, value: 72234),
-    Stock(name: 'USD', count: 60234, value: 60234),
-    Stock(name: 'KRW', count: 56327600, value: 40234),
+    Stock(name: '삼성전자', count: 1842.05, price: 55.5),
+    Stock(name: '애플', count: 380.45, price: 189.8),
+    Stock(name: 'USD', count: 60234, price: 1),
+    Stock(name: 'KRW', count: 56327600, price: 0.00085),
   ];
 
   @override
   void initState() {
     super.initState();
+    totalBalance = _calculateTotalBalance();
+  }
+
+  double _calculateTotalBalance() {
+    return stocks.fold(0, (sum, stock) => sum + stock.value);
   }
 
   String _formatCurrency(double value) {
-    final formatter = NumberFormat('#,##0');
+    final formatter = NumberFormat('#,##0.00');
     return formatter.format(value);
   }
 
@@ -65,16 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (result != null) {
       setState(() {
-        // 교환 후 상태 업데이트
-        Stock fromStock =
-            stocks.firstWhere((stock) => stock.name == result['fromStockName']);
-        Stock toStock =
-            stocks.firstWhere((stock) => stock.name == result['toStockName']);
-
-        fromStock.count = result['fromStockCount']!;
-        fromStock.value = result['fromStockValue']!;
-        toStock.count = result['toStockCount']!;
-        toStock.value = result['toStockValue']!;
+        totalBalance = _calculateTotalBalance();
       });
     }
   }

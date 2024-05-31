@@ -37,16 +37,11 @@ class _ConvertScreenState extends State<ConvertScreen> {
     });
   }
 
-  double get _fromStockPrice =>
-      _fromStock.count != 0 ? _fromStock.value / _fromStock.count : 0;
-  double get _toStockPrice =>
-      _toStock.count != 0 ? _toStock.value / _toStock.count : 0;
-
   void _calculateToStockCount(String value) {
     setState(() {
       double fromStockCount = double.tryParse(value) ?? 0;
-      double toStockCount = _toStockPrice != 0
-          ? (fromStockCount * _fromStockPrice) / _toStockPrice
+      double toStockCount = _toStock.price != 0
+          ? (fromStockCount * _fromStock.price) / _toStock.price
           : 0;
       _toController.text = toStockCount.toStringAsFixed(4);
     });
@@ -56,25 +51,23 @@ class _ConvertScreenState extends State<ConvertScreen> {
     double fromStockCount = double.tryParse(_fromController.text) ?? 0;
     double toStockCount = double.tryParse(_toController.text) ?? 0;
 
-    if (fromStockCount <= 0 || toStockCount <= 0) {
+    if (fromStockCount <= 0 ||
+        toStockCount <= 0 ||
+        fromStockCount > _fromStock.count) {
       // 유효하지 않은 값 처리
       return;
     }
 
     setState(() {
       _fromStock.count -= fromStockCount;
-      _fromStock.value -= fromStockCount * _fromStockPrice;
       _toStock.count += toStockCount;
-      _toStock.value += toStockCount * _toStockPrice;
     });
 
     Navigator.of(context).pop({
       'fromStockName': _fromStock.name,
       'fromStockCount': _fromStock.count,
-      'fromStockValue': _fromStock.value,
       'toStockName': _toStock.name,
       'toStockCount': _toStock.count,
-      'toStockValue': _toStock.value,
     });
   }
 
