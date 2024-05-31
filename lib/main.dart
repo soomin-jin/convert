@@ -24,7 +24,6 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _MyHomePageState createState() => _MyHomePageState();
 }
 
@@ -66,12 +65,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (result != null) {
       setState(() {
-        fromStock.count -= result['fromStockCount']!;
-        fromStock.value -= result['fromStockValue']!;
+        // 교환 후 상태 업데이트
+        Stock fromStock =
+            stocks.firstWhere((stock) => stock.name == result['fromStockName']);
         Stock toStock =
             stocks.firstWhere((stock) => stock.name == result['toStockName']);
-        toStock.count += result['toStockCount']!;
-        toStock.value += result['toStockValue']!;
+
+        fromStock.count = result['fromStockCount']!;
+        fromStock.value = result['fromStockValue']!;
+        toStock.count = result['toStockCount']!;
+        toStock.value = result['toStockValue']!;
       });
     }
   }
