@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/stock.dart';
+import '../widgets/stock_card.dart';
+import '../widgets/stock_picker.dart';
+import '../widgets/popup_dialog.dart';
 
 class ConvertScreen extends StatefulWidget {
   final Stock fromStock;
@@ -84,66 +87,34 @@ class _ConvertScreenState extends State<ConvertScreen> {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return Container(
-              color: Colors.white,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const SizedBox(height: 16),
-                  Container(
-                    width: 60,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        labelText: '검색 후 교환할 종목을 선택해 주세요.',
-                        prefixIcon: Icon(Icons.search),
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: widget.stocks.length,
-                      itemBuilder: (context, index) {
-                        final stock = widget.stocks[index];
-                        return ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.blue,
-                            child: Text(
-                              stock.name[0],
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ),
-                          title: Text(stock.name),
-                          trailing: const Text('보유'),
-                          onTap: () {
-                            setState(() {
-                              if (isFrom) {
-                                _fromStock = stock;
-                              } else {
-                                _toStock = stock;
-                              }
-                            });
-                            Navigator.pop(context);
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            );
+        return StockPicker(
+          stocks: widget.stocks,
+          isFrom: isFrom,
+          onStockSelected: (selectedStock) {
+            setState(() {
+              if (isFrom) {
+                _fromStock = selectedStock;
+              } else {
+                _toStock = selectedStock;
+              }
+            });
+          },
+        );
+      },
+    );
+  }
+
+  void _showPopupDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return PopupDialog(
+          onConfirm: () {
+            Navigator.of(context).pop();
+            _handleConvert();
+          },
+          onCancel: () {
+            Navigator.of(context).pop();
           },
         );
       },
@@ -173,11 +144,27 @@ class _ConvertScreenState extends State<ConvertScreen> {
                   children: [
                     _buildDropdown(),
                     const SizedBox(height: 20),
-                    _buildStockCard("From", _fromController, _fromStock, true),
+                    StockCard(
+                      label: "From",
+                      controller: _fromController,
+                      selectedStock: _fromStock,
+                      isFrom: true,
+                      showStockPicker: () => _showStockPicker(true),
+                      focusNode: _fromFocusNode,
+                      onChanged: _calculateToStockCount,
+                    ),
                     const SizedBox(height: 20),
                     const Icon(Icons.swap_vert, size: 40, color: Colors.black),
                     const SizedBox(height: 20),
-                    _buildStockCard("To", _toController, _toStock, false),
+                    StockCard(
+                      label: "To",
+                      controller: _toController,
+                      selectedStock: _toStock,
+                      isFrom: false,
+                      showStockPicker: () => _showStockPicker(false),
+                      focusNode: _toFocusNode,
+                      onChanged: (value) {},
+                    ),
                     const SizedBox(height: 20),
                     const Text(
                       '❗ 시장가로 교환합니다.',
@@ -201,7 +188,7 @@ class _ConvertScreenState extends State<ConvertScreen> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                onPressed: _handleConvert,
+                onPressed: _showPopupDialog,
                 child: const Text(
                   "교환하기",
                   style: TextStyle(
@@ -228,127 +215,6 @@ class _ConvertScreenState extends State<ConvertScreen> {
         ),
         Icon(Icons.arrow_drop_down, color: Colors.black),
       ],
-    );
-  }
-
-  Widget _buildStockCard(String label, TextEditingController controller,
-      Stock selectedStock, bool isFrom) {
-    return GestureDetector(
-      onTap: () => _showStockPicker(isFrom),
-      child: Container(
-        height: 170, // 고정 높이 약간 더 늘림
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-        decoration: BoxDecoration(
-          color: const Color(0xFFFAFAFA), // 배경색 변경
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.transparent), // 테두리 제거
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(label,
-                    style: const TextStyle(fontSize: 14, color: Colors.grey)),
-                const Spacer(),
-                Padding(
-                  padding:
-                      const EdgeInsets.only(right: 20.0), // 오른쪽 패딩 절반 정도만 추가
-                  child: Text(
-                    '${selectedStock.count.toStringAsFixed(4)} 주',
-                    style: const TextStyle(
-                        color: Color(0xFF949494),
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(top: 8), // 이미지를 2px 더 올림
-                  child: CircleAvatar(
-                    backgroundColor: Colors.blue,
-                    child: Text(
-                      selectedStock.name[0],
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Container(
-                  margin: const EdgeInsets.only(top: 17), // 텍스트를 2px 내림
-                  child: Text(selectedStock.name,
-                      style:
-                          const TextStyle(color: Colors.black, fontSize: 16)),
-                ),
-                const SizedBox(width: 5),
-                Container(
-                  margin: const EdgeInsets.only(top: 17), // 텍스트를 2px 내림
-                  child: const Icon(Icons.arrow_drop_down, color: Colors.black),
-                ),
-                const Spacer(),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    SizedBox(
-                      width: 160, // 너비를 줄임
-                      height: 40, // 높이 조정
-                      child: TextField(
-                        focusNode: isFrom ? _fromFocusNode : _toFocusNode,
-                        textAlign: TextAlign.right,
-                        controller: controller,
-                        keyboardType: TextInputType.number,
-                        style: const TextStyle(fontSize: 20), // 폰트 크기 키움
-                        decoration: const InputDecoration(
-                          hintText: '0',
-                          border: InputBorder.none,
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-                        ),
-                        onTap: () {
-                          if (controller.text == '0') {
-                            controller.clear();
-                          }
-                        },
-                        onChanged: (value) {
-                          if (isFrom) {
-                            _calculateToStockCount(value);
-                          }
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 15), // 높이 더 늘림
-                    if (isFrom)
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _fromController.text =
-                                selectedStock.count.toStringAsFixed(4);
-                            _calculateToStockCount(_fromController.text);
-                          });
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.only(
-                              right: 20.0, top: 3), // 오른쪽 패딩 추가, 아래로 3px 이동
-                          child: Text('최대',
-                              style: TextStyle(
-                                  color: Colors.teal,
-                                  fontSize: 18,
-                                  fontWeight:
-                                      FontWeight.bold)), // 글씨 크기와 두께를 키움
-                        ),
-                      ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
