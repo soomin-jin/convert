@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'models/stock.dart';
-import 'screens/convert_screen.dart';
-import 'widgets/button.dart';
-import 'widgets/currency_card.dart';
+import 'screens/home_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,193 +25,64 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  double totalBalance = 0;
-  int selectedIndex = -1;
-
   List<Stock> stocks = [
-    Stock(name: '삼성전자', count: 1842.05, price: 55.5),
-    Stock(name: '애플', count: 380.45, price: 189.8),
-    Stock(name: 'USD', count: 60234, price: 1),
-    Stock(name: 'KRW', count: 56327600, price: 0.00085),
+    Stock(name: '삼성전자', count: 1842.05, price: 73000),
+    Stock(name: '애플', count: 380.45, price: 230000),
+    Stock(name: 'USD', count: 60234, price: 1400),
+    Stock(name: 'KRW', count: 56327600, price: 1),
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    totalBalance = _calculateTotalBalance();
-  }
-
-  double _calculateTotalBalance() {
-    return stocks.fold(0, (sum, stock) => sum + stock.value);
-  }
-
-  String _formatCurrency(double value) {
-    final formatter = NumberFormat('#,##0.00');
-    return formatter.format(value);
-  }
-
-  void _handleCardTap(int index) {
-    setState(() {
-      selectedIndex = (selectedIndex == index) ? -1 : index;
-    });
-  }
-
-  void _navigateToConvertScreen(BuildContext context, Stock fromStock) async {
-    final result = await Navigator.push<Map<String, dynamic>>(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            ConvertScreen(fromStock: fromStock, stocks: stocks),
-      ),
-    );
-
-    if (result != null) {
-      setState(() {
-        totalBalance = _calculateTotalBalance();
-      });
-    }
-  }
-
-  void _handleConvertButtonPressed() {
-    // 선택된 주식이 없는 경우 첫 번째 주식을 기본으로 사용
-    final Stock fromStock =
-        selectedIndex != -1 ? stocks[selectedIndex] : stocks[0];
-    _navigateToConvertScreen(context, fromStock);
-  }
+  int _selectedIndex = 2; // 세 번째 탭이 초기 활성화된 탭
 
   @override
   Widget build(BuildContext context) {
-    // 화면 너비를 가져옵니다.
-    double screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
-      backgroundColor: const Color(0xFF181818),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        const Text(
-                          'Hello, Zimmy',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        Text(
-                          'Welcome back',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 18,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 120),
-              Text(
-                'Total balance',
-                style: TextStyle(
-                  fontSize: 22,
-                  color: Colors.white.withOpacity(0.8),
-                ),
-              ),
-              Text(
-                '\$ ${_formatCurrency(totalBalance)}',
-                style: TextStyle(
-                    fontSize: 42,
-                    color: Colors.white.withOpacity(1),
-                    fontWeight: FontWeight.bold),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Button(
-                      text: 'Deposit',
-                      bgColor: const Color.fromARGB(255, 70, 75, 80),
-                      textColor: Colors.white,
-                      width: screenWidth * 0.25, // 화면 너비의 25%로 설정
-                      onTap: () {}, // 여기에 버튼 동작 추가
-                    ),
-                    Button(
-                      text: 'Withdraw',
-                      bgColor: const Color.fromARGB(255, 70, 75, 80),
-                      textColor: Colors.white,
-                      width: screenWidth * 0.25, // 화면 너비의 25%로 설정
-                      onTap: () {}, // 여기에 버튼 동작 추가
-                    ),
-                    Button(
-                      text: 'Convert',
-                      bgColor: const Color.fromARGB(255, 9, 116, 166),
-                      textColor: Colors.white,
-                      width: screenWidth * 0.25, // 화면 너비의 25%로 설정
-                      onTap: _handleConvertButtonPressed,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 60),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Wallets',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    'View All',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Column(
-                children: stocks.asMap().entries.map((entry) {
-                  int index = entry.key;
-                  Stock stock = entry.value;
-                  return Column(
-                    children: [
-                      CurrencyCard(
-                        name: stock.name,
-                        amount: stock.count.toStringAsFixed(2),
-                        value: _formatCurrency(stock.value),
-                        icon: Icons.euro_rounded,
-                        isInverted: false,
-                        isSelected: selectedIndex == index,
-                        onTap: () => _handleCardTap(index),
-                        showPopup: () =>
-                            _navigateToConvertScreen(context, stock),
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                  );
-                }).toList(),
-              ),
-            ],
+      body: _buildBody(),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _selectedIndex,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: '홈',
           ),
-        ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: '검색',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_balance_wallet),
+            label: '내 자산',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.more_horiz),
+            label: '더보기',
+          ),
+        ],
+        onTap: (index) {
+          if (index == 2) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          }
+        },
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey,
       ),
     );
+  }
+
+  Widget _buildBody() {
+    switch (_selectedIndex) {
+      case 2:
+        return HomeScreen(stocks: stocks);
+      default:
+        return const Center(
+          child: Text(
+            '탭을 사용할 수 없습니다',
+            style: TextStyle(fontSize: 24),
+          ),
+        );
+    }
   }
 }
