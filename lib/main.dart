@@ -28,7 +28,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Stock> stocks = [
     Stock(name: '삼성전자', count: 1842.05, price: 73000),
     Stock(name: '애플', count: 380.45, price: 230000),
-    Stock(name: 'USD', count: 60234, price: 1400),
+    Stock(name: 'USD', count: 60234, price: 1386),
     Stock(name: 'KRW', count: 56327600, price: 1),
   ];
 
