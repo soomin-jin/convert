@@ -1,5 +1,5 @@
-name: toonflix
-description: "A new Flutter project."
+name: convert
+description: "바로 교환하기 서비스"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -33,6 +33,7 @@ dependencies:
   fl_chart: ^0.36.0
   intl: ^0.17.0
   cupertino_icons: ^1.0.2
+  flutter_svg: ^1.0.3
 
 dev_dependencies:
   flutter_test:
@@ -42,5 +43,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/icons/swap_btn_icon.png
-    - assets/icons/info_icon.png
+    - assets/icons/swap_btn_icon.svg
+    - assets/icons/info_icon.svg

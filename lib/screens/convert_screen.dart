@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../models/stock.dart';
 import '../widgets/stock_card.dart';
 import '../widgets/stock_picker.dart';
@@ -71,6 +72,17 @@ class _ConvertScreenState extends State<ConvertScreen> {
       'fromStockCount': _fromStock.count,
       'toStockName': _toStock.name,
       'toStockCount': _toStock.count,
+    });
+  }
+
+  void _swapStocks() {
+    setState(() {
+      final tempStock = _fromStock;
+      _fromStock = _toStock;
+      _toStock = tempStock;
+
+      _fromController.clear();
+      _toController.clear();
     });
   }
 
@@ -154,10 +166,22 @@ class _ConvertScreenState extends State<ConvertScreen> {
                       onChanged: _calculateToStockCount,
                     ),
                     const SizedBox(height: 20),
-                    SizedBox(
-                      height: 40,
-                      width: 40,
-                      child: Image.asset('assets/icons/swap_btn_icon.png'),
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 30, // 반지름 크기 조정
+                          backgroundColor: Colors.white, // 배경색을 white로 설정
+                          child: IconButton(
+                            icon: SvgPicture.asset(
+                              'assets/icons/swap_btn_icon.svg',
+                              width: 50,
+                              height: 50,
+                            ),
+                            onPressed: _swapStocks,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 20),
                     StockCard(
@@ -170,16 +194,16 @@ class _ConvertScreenState extends State<ConvertScreen> {
                       onChanged: (value) {},
                     ),
                     const SizedBox(height: 20),
-                    const Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ImageIcon(
-                          AssetImage('assets/icons/info_icon.png'),
-                          size: 24.0,
-                          color: Colors.grey,
+                        SvgPicture.asset(
+                          'assets/icons/info_icon.svg',
+                          width: 16,
+                          height: 16,
                         ),
-                        SizedBox(width: 8),
-                        Text(
+                        const SizedBox(width: 8),
+                        const Text(
                           '시장가로 교환합니다.',
                           style: TextStyle(color: Colors.grey),
                         ),
