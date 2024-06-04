@@ -30,6 +30,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+    assets:
+      - assets/icons/swap_btn_icon.png
+      - assets/icons/info_icon.png
   fl_chart: ^0.36.0
   intl: ^0.17.0
 

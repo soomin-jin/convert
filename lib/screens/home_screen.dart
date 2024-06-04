@@ -114,10 +114,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF4F5F6), // 전체 배경색 변경
       appBar: AppBar(
         title: const Text('내 자산', style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFF4F5F6), // AppBar 배경색 변경
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
@@ -127,30 +127,95 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '나의 순자산',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                '${_formatCurrency(totalBalance)}원',
-                style:
-                    const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              AspectRatio(
-                aspectRatio: 1.5,
-                child: PieChart(
-                  PieChartData(
-                    sections: _getSections(),
-                    sectionsSpace: 0,
-                    centerSpaceRadius: 40,
-                    borderData: FlBorderData(show: false),
-                    pieTouchData: PieTouchData(enabled: false),
-                  ),
+              Container(
+                color: const Color(0xFFF4F5F6), // 최상단 내자산 부분 색상 변경
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '나의 순자산',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity, // 가로 전체를 차지하도록 설정
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white, // 흰색 배경
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 6,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Align(
+                            alignment: Alignment.topRight,
+                            child: Text(
+                              '내 자산이 있는 총 1개의 계좌 합산',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            '${_formatCurrency(totalBalance)}원',
+                            style: const TextStyle(
+                                fontSize: 32, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: PieChart(
+                        PieChartData(
+                          sections: _getSections(),
+                          sectionsSpace: 0,
+                          centerSpaceRadius: 40,
+                          borderData: FlBorderData(show: false),
+                          pieTouchData: PieTouchData(enabled: false),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 20), // 도넛 차트와 종목 정보 사이의 여백 추가
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildLegendItem(
+                            '국내주식', Colors.blue, _calculatePercentage('국내주식')),
+                        _buildLegendItem('해외주식', Colors.purple,
+                            _calculatePercentage('해외주식')),
+                        _buildLegendItem(
+                            '원화', Colors.green, _calculatePercentage('원화')),
+                        _buildLegendItem(
+                            '외화', Colors.orange, _calculatePercentage('외화')),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 40),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -161,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   label: const Text('매도 바로받기'),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.black,
-                    backgroundColor: const Color(0xFFF7F8F9),
+                    backgroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -177,8 +242,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: const Icon(Icons.swap_horiz),
                   label: const Text('교환 바로받기'),
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.teal,
+                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -197,6 +262,71 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  double _calculatePercentage(String title) {
+    double value = 0;
+    switch (title) {
+      case '국내주식':
+        value = domesticStocks.fold(0.0, (sum, stock) => sum + stock.value);
+        break;
+      case '해외주식':
+        value =
+            internationalStocks.fold(0.0, (sum, stock) => sum + stock.value);
+        break;
+      case '원화':
+        value = cashStocks
+            .where((stock) => stock.name == 'KRW')
+            .fold(0.0, (sum, stock) => sum + stock.value);
+        break;
+      case '외화':
+        value = cashStocks
+            .where((stock) => stock.name == 'USD')
+            .fold(0.0, (sum, stock) => sum + stock.value);
+        break;
+    }
+    return (value / totalBalance) * 100;
+  }
+
+  Widget _buildLegendItem(String title, Color color, double percentage) {
+    return Padding(
+      padding:
+          const EdgeInsets.symmetric(vertical: 2), // 퍼센트 정보와 종목 정보 간의 여백 줄임
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 8, // 크기를 줄임
+                height: 8,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle, // 동그라미 모양으로 변경
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+          Text(
+            '${percentage.toStringAsFixed(2)}%',
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+              color: Colors.black,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildStockCategory(String title, List<Stock> stocks) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,6 +340,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Column(
           children: stocks.map((stock) {
             return Card(
+              color: Colors.white, // 주식 종목 리스트의 배경색을 흰색으로 설정
               child: ListTile(
                 leading: CircleAvatar(
                   backgroundColor: Colors.blue,

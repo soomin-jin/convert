@@ -154,7 +154,11 @@ class _ConvertScreenState extends State<ConvertScreen> {
                       onChanged: _calculateToStockCount,
                     ),
                     const SizedBox(height: 20),
-                    const Icon(Icons.swap_vert, size: 40, color: Colors.black),
+                    SizedBox(
+                      height: 40,
+                      width: 40,
+                      child: Image.asset('assets/icons/swap_btn_icon.png'),
+                    ),
                     const SizedBox(height: 20),
                     StockCard(
                       label: "To",
