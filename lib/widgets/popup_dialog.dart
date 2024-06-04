@@ -23,9 +23,10 @@ class PopupDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const SizedBox(height: 20),
             const Text(
-              '교환하시겠습니까?',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              '선택한 자산을 교환할까요?',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 20),
             Row(
@@ -33,42 +34,46 @@ class PopupDialog extends StatelessWidget {
               children: [
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal, // Convert button color
+                    backgroundColor: const Color(0xFFE1F6F5), // Lighter grey
                     padding: const EdgeInsets.symmetric(
                         vertical: 10, horizontal: 20),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
+                    minimumSize: const Size(120, 50), // 버튼의 최소 너비와 높이 설정
                   ),
-                  onPressed: onConfirm,
+                  onPressed: onCancel,
                   child: const Text(
-                    "Confirm",
+                    "아니오",
                     style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
+                        fontSize: 20,
+                        fontWeight: FontWeight.normal,
+                        color: Color(0xFF00B0AD)),
                   ),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD3D3D3), // Lighter grey
+                    backgroundColor:
+                        const Color(0xFF00B0AD), // Convert button color
                     padding: const EdgeInsets.symmetric(
                         vertical: 10, horizontal: 20),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
+                    minimumSize: const Size(120, 50), // 버튼의 최소 너비와 높이 설정
                   ),
-                  onPressed: onCancel,
+                  onPressed: onConfirm,
                   child: const Text(
-                    "Cancel",
+                    "예",
                     style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF9E9E9E)),
+                        fontSize: 20,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.white),
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 10),
           ],
         ),
       ),

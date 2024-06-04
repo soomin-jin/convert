@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .where((stock) => stock.name == 'USD')
         .fold(0.0, (sum, stock) => sum + stock.value);
 
-    return [
+    List<PieChartSectionData> sections = [
       PieChartSectionData(
         color: Colors.blue,
         value: domesticValue,
@@ -86,6 +86,11 @@ class _HomeScreenState extends State<HomeScreen> {
         radius: 50,
       ),
     ];
+
+    // 내림차순으로 정렬
+    sections.sort((a, b) => b.value.compareTo(a.value));
+
+    return sections;
   }
 
   void _navigateToConvertScreen() async {
@@ -113,6 +118,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<PieChartSectionData> sections = _getSections();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF4F5F6), // 전체 배경색 변경
       appBar: AppBar(
@@ -187,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       aspectRatio: 1,
                       child: PieChart(
                         PieChartData(
-                          sections: _getSections(),
+                          sections: sections,
                           sectionsSpace: 0,
                           centerSpaceRadius: 40,
                           borderData: FlBorderData(show: false),
@@ -201,16 +208,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     flex: 1,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _buildLegendItem(
-                            '국내주식', Colors.blue, _calculatePercentage('국내주식')),
-                        _buildLegendItem('해외주식', Colors.purple,
-                            _calculatePercentage('해외주식')),
-                        _buildLegendItem(
-                            '원화', Colors.green, _calculatePercentage('원화')),
-                        _buildLegendItem(
-                            '외화', Colors.orange, _calculatePercentage('외화')),
-                      ],
+                      children: sections.map((section) {
+                        return _buildLegendItem(
+                          section.title,
+                          section.color,
+                          _calculatePercentage(section.title),
+                        );
+                      }).toList(),
                     ),
                   ),
                 ],

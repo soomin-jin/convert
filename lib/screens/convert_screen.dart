@@ -221,7 +221,7 @@ class _ConvertScreenState extends State<ConvertScreen> {
               width: double.infinity, // 너비를 화면에 맞게 조정
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
+                  backgroundColor: const Color(0xff00b0ad),
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
