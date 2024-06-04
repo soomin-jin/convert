@@ -170,9 +170,20 @@ class _ConvertScreenState extends State<ConvertScreen> {
                       onChanged: (value) {},
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      '❗ 시장가로 교환합니다.',
-                      style: TextStyle(color: Colors.grey),
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ImageIcon(
+                          AssetImage('assets/icons/info_icon.png'),
+                          size: 24.0,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          '시장가로 교환합니다.',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 20),
                   ],
